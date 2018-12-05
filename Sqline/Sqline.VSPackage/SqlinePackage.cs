@@ -31,10 +31,16 @@ namespace Sqline.VSPackage {
 			FLog = new LogWindow(this, FContext);
 			FDocumentEvents = Context.Application.Events.get_DocumentEvents(null);
 			FDocumentEvents.DocumentSaved += OnDocumentSaved;
+            FContext.Application.Events.BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
 			FContext.Application.Events.BuildEvents.OnBuildBegin += OnBuildBegin;
 		}
 
-		private void OnBuildBegin(vsBuildScope Scope, vsBuildAction Action) {
+        private void BuildEvents_OnBuildDone(vsBuildScope Scope, vsBuildAction Action)
+        {
+
+        }
+
+        private void OnBuildBegin(vsBuildScope Scope, vsBuildAction Action) {
 			FLog.Clear();
 			try {
 				List<Project> OProjects = new List<Project>();
@@ -108,6 +114,9 @@ namespace Sqline.VSPackage {
 					foreach (string OFile in OGenerator.OutputFiles) {
 						ProjectItem OItem = document.ProjectItem.ProjectItems.AddFromFile(OFile);
 					}
+                    
+                    //KAGE temp, BuildEvent er broken i vs 2017, lav dataacess her istedet
+				    OnBuildBegin(vsBuildScope.vsBuildScopeProject, vsBuildAction.vsBuildActionBuild);
 				}
 			}
 			catch (Exception ex) {

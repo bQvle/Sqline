@@ -4,7 +4,22 @@
 			<# } else { #>
 			<#= OScalarItem.CsType #> OResult = default(<#= OScalarItem.CsType #>);
 			<# } #>
+			
+			<# if (OMethod.Sql.Conditional) { #>
+			StringBuilder OSQLBuilder = new StringBuilder();
+			<# foreach (SQLWithCondition c in OMethod.Sql.SQLWithConditions) { #>
+			<# if (c.Condition != null) {#>
+			if (<#= c.Condition #> != null)
+			<# } #>
+			OSQLBuilder.Append(@"<#= c.Value  #>").Append(" ");
+			<# } #>
+			string OSql = OSQLBuilder.ToString();
+			<# } else { #>
 			string OSql = @"<#= OMethod.Sql.Statement #>";
+			<# } #>
+
+
+
 			<#@ include file="SqlTransform.t4" #>
 			<# if (!OTransactionSupport) { #>
 			using (IDbConnection OConnection = Provider.Current.GetConnection(<#= OItemFile.Configuration.ProjectHandler.SqlineConfig #>.ConnectionString)) {
