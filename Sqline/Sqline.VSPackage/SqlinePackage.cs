@@ -96,7 +96,7 @@ namespace Sqline.VSPackage {
 			if (project == null) {
 				return;
 			}
-			if (project.Kind == ProjectKinds.vsProjectKindSolutionFolder) {
+			if (project.Kind == EnvDTE.Constants.vsProjectKindSolutionItems) {
 				foreach (ProjectItem OProjectItem in project.ProjectItems) {
 					FindSqlineProjects(OProjectItem.SubProject, result);
 				}
