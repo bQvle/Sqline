@@ -2,22 +2,26 @@
 using System;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Shell;
 using EnvDTE80;
 using EnvDTE;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio;
+using System.Threading;
+using Microsoft.VisualStudio.Shell;
 
 namespace Sqline.VSPackage {
-	// This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is a package.
-	[PackageRegistration(UseManagedResourcesOnly = true)]
-	// This attribute is used to register the information needed to show this package
-	// in the Help/About dialog of Visual Studio.
-	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
-	[Guid(GuidList.guidSqlinePkgString)]
-	[ProvideAutoLoad("{f1536ef8-92ec-443c-9ed7-fdadf150da82}")]
-	[ProvideAutoLoad("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}")]
-	public sealed class SqlinePackage : Package, IDisposable {
+    // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is a package.
+    // This attribute is used to register the information needed to show this package
+    // in the Help/About dialog of Visual Studio.
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
+    [Guid(GuidList.guidSqlinePkgString)]
+	//[ProvideAutoLoad("{f1536ef8-92ec-443c-9ed7-fdadf150da82}")]
+	//[ProvideAutoLoad("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}")]
+	public sealed class SqlinePackage : AsyncPackage {
 		private AddinContext FContext;
 		private DocumentEvents FDocumentEvents;
 		private LogWindow FLog;
@@ -25,15 +29,20 @@ namespace Sqline.VSPackage {
 		public SqlinePackage() {
 		}
 
-		protected override void Initialize() {
-			base.Initialize();
-			FContext = new AddinContext((DTE2)GetService(typeof(SDTE)), this);
-			FLog = new LogWindow(this, FContext);
-			FDocumentEvents = Context.Application.Events.get_DocumentEvents(null);
-			FDocumentEvents.DocumentSaved += OnDocumentSaved;
+
+
+        protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress) {
+            FContext = new AddinContext((DTE2)GetService(typeof(SDTE)), this);
+            FLog = new LogWindow(this, FContext);
+            FDocumentEvents = Context.Application.Events.get_DocumentEvents(null);
+            FDocumentEvents.DocumentSaved += OnDocumentSaved;
             FContext.Application.Events.BuildEvents.OnBuildDone += BuildEvents_OnBuildDone;
-			FContext.Application.Events.BuildEvents.OnBuildBegin += OnBuildBegin;
-		}
+            FContext.Application.Events.BuildEvents.OnBuildBegin += OnBuildBegin;
+
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            await base.InitializeAsync(cancellationToken, progress);
+
+        }
 
         private void BuildEvents_OnBuildDone(vsBuildScope Scope, vsBuildAction Action)
         {
