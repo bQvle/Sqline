@@ -1,4 +1,8 @@
-﻿		<#= OMethod.VisibilityString #> <#= OMethod.Result == ResultType.List ? "List<" + OViewItem.FullName + ">" :  OViewItem.FullName #> <#= OMethod.Name #>(<#= GetArguments(OMethod, OTransactionSupport) #>) {
+﻿		<#= OMethod.VisibilityString #> async Task<<#= OMethod.Result == ResultType.List ? "List<" + OViewItem.FullName + ">" :  OViewItem.FullName #>> <#= OMethod.Name #>Async(<#= GetArguments(OMethod, OTransactionSupport) #>) {
+			return await Task.Run(() => <#= OMethod.Name #>(<#= GetArgumentValues(OMethod, OTransactionSupport) #>));
+		}
+		
+		<#= OMethod.VisibilityString #> <#= OMethod.Result == ResultType.List ? "List<" + OViewItem.FullName + ">" :  OViewItem.FullName #> <#= OMethod.Name #>(<#= GetArguments(OMethod, OTransactionSupport) #>) {
 			<# if (OMethod.Result == ResultType.List) { #>
 			List<<#= OViewItem.FullName #>> OResult = new List<<#= OViewItem.FullName #>>();
 			<# } else { #>

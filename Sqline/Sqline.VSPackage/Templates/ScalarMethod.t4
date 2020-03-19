@@ -1,4 +1,8 @@
-﻿		<#= OMethod.VisibilityString #> <#= OMethod.Result == ResultType.List ? "List<" + OScalarItem.CsType + ">" :  OScalarItem.CsType #> <#= OMethod.Name #>(<#= GetArguments(OMethod, OTransactionSupport) #>) {
+﻿		<#= OMethod.VisibilityString #> async Task<<#= OMethod.Result == ResultType.List ? "List<" + OScalarItem.CsType + ">" :  OScalarItem.CsType #>> <#= OMethod.Name #>Async(<#= GetArguments(OMethod, OTransactionSupport) #>) {
+			return await Task.Run(() => <#= OMethod.Name #>(<#= GetArgumentValues(OMethod, OTransactionSupport) #>));
+		}
+
+		<#= OMethod.VisibilityString #> <#= OMethod.Result == ResultType.List ? "List<" + OScalarItem.CsType + ">" :  OScalarItem.CsType #> <#= OMethod.Name #>(<#= GetArguments(OMethod, OTransactionSupport) #>) {
 			<# if (OMethod.Result == ResultType.List) { #>
 			List<<#= OScalarItem.CsType #>> OResult = new List<<#= OScalarItem.CsType #>>();
 			<# } else { #>

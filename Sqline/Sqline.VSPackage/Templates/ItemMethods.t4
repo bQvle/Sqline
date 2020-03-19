@@ -22,6 +22,7 @@ using System.Text;
 using System.Collections.Generic;
 using Sqline.ClientFramework;
 using Sqline.ClientFramework.ProviderModel;
+using System.Threading.Tasks;
 <# foreach (Using OUsing in OItemFile.Configuration.Methods.Usings) { #>
 using <#= OUsing.Namespace #>;
 <# } #>
@@ -90,6 +91,20 @@ public string GetArguments(BaseMethod method, bool transactionSupport) {
 		}
 		result.Append(OParameter.CsType);
 		result.Append(" ");
+		result.Append(OParameter.ArgumentName);
+	}
+	return result.ToString();
+}
+
+public string GetArgumentValues(BaseMethod method, bool transactionSupport) {
+	StringBuilder result = new StringBuilder();
+	if (transactionSupport) {
+		result.Append("connection, transaction");
+	}
+	foreach (Parameter OParameter in method.Parameters) {
+		if (result.Length > 0) {
+			result.Append(", ");
+		}
 		result.Append(OParameter.ArgumentName);
 	}
 	return result.ToString();

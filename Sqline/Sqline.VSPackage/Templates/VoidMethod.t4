@@ -1,4 +1,8 @@
-﻿		<#= OMethod.VisibilityString #> int <#= OMethod.Name #>(<#= GetArguments(OMethod, OTransactionSupport) #>) {
+﻿		<#= OMethod.VisibilityString #> async Task<int> <#= OMethod.Name #>Async(<#= GetArguments(OMethod, OTransactionSupport) #>) {
+			return await Task.Run(() => <#= OMethod.Name #>(<#= GetArgumentValues(OMethod, OTransactionSupport) #>));
+		}
+
+		<#= OMethod.VisibilityString #> int <#= OMethod.Name #>(<#= GetArguments(OMethod, OTransactionSupport) #>) {
 			int OResult = 0;
 
 			<# if (OMethod.Sql.Conditional) { #>
