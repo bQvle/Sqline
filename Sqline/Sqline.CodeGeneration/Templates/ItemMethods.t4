@@ -6,6 +6,7 @@
 <#@ import namespace="Sqline.CodeGeneration.ViewModel" #>
 <#@ import namespace="Sqline.ClientFramework" #>
 <#@ import namespace="System.IO" #>
+
 <#@ parameter type="System.String" name="ItemFilename" #> 
 <#@ parameter type="System.String" name="ProjectDir" #> 
 
@@ -95,6 +96,10 @@ public string GetArguments(BaseMethod method, bool transactionSupport) {
 	}
 	return result.ToString();
 }
+
+#>
+
+<#+ 
 
 public string GetArgumentValues(BaseMethod method, bool transactionSupport) {
 	StringBuilder result = new StringBuilder();

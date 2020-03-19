@@ -23,6 +23,11 @@ namespace Sqline.ClientFramework {
 			FConfig = config;
 		}
 
+		public virtual async Task<int> ExecuteAsync() {
+			return await Task.Run(() => Execute());
+
+		}
+
 		public virtual int Execute() {
 			using (IDbConnection OConnection = Provider.Current.GetConnection(FConfig.ConnectionString)) {
 				OConnection.Open();
