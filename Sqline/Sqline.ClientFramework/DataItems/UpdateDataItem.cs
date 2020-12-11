@@ -14,6 +14,7 @@ namespace Sqline.ClientFramework {
 
 		}
 
+
 		protected override string GetQueryableStatement(string tableName, string valueParameters, string whereParameters) {
 			if (whereParameters.Length == 0 && !FAllowUnsafeQuery) {
 				throw new Exception("Unsafe UPDATE statement, no wheres specified!");
