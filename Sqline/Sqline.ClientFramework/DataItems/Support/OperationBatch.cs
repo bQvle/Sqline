@@ -2,30 +2,39 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Sqline.ClientFramework.ProviderModel;
 
 namespace Sqline.ClientFramework {
-    public class OperationBatch<T> where T : BaseDataItem {
+    public abstract class OperationBatch {
+        protected int FBatchSize = 100;
+        public string Type { get; set; }
+        public OperationBatch(int batchSize, string type) {
+            Type = type;
+            FBatchSize = batchSize;
+        }
+        
+       
+
+        public abstract int Execute();
+    }
+
+
+    public class OperationBatch<T> : OperationBatch where T : BaseDataItem {
         public List<T> FOperations = new List<T>();
         public List<T> FCurrentBatch = new List<T>();
-        private int FBatchSize = 100;
-        public string LastSql { get; set; }
-
-        public OperationBatch() {
+        public OperationBatch() : base(100, typeof(T).Name) {
         }
 
-        public OperationBatch(int batchSize) {
-            FBatchSize = batchSize;
+        public OperationBatch(int batchSize) : base(batchSize, typeof(T).Name) {
         }
 
         public void Add(T operation) {
             lock (FOperations)
                 FOperations.Add(operation);
         }
+
 
         private bool IsAllInserts() {
             if (FCurrentBatch.Count == 0) {
@@ -43,7 +52,7 @@ namespace Sqline.ClientFramework {
             return true;
         }
 
-        public int Execute() {
+        public override int Execute() {
             var result = 0;
             while (FOperations.Count > 0) {
                 var amount = Math.Min(FBatchSize, FOperations.Count);
@@ -71,7 +80,7 @@ namespace Sqline.ClientFramework {
                         OParam.AddParameter(OCommand);
                     }
                 }
-                String OSql = LastSql = IsAllInserts() ? PrepareAllInsertStatement() : PrepareAppendedStatement();
+                String OSql = IsAllInserts() ? PrepareAllInsertStatement() : PrepareAppendedStatement();
 
                 OCommand.CommandText = OSql;
                 int OResult = OCommand.ExecuteNonQuery();
@@ -111,5 +120,7 @@ namespace Sqline.ClientFramework {
             }
             return OSql.ToString();
         }
+
+
     }
 }
